@@ -1,0 +1,212 @@
+import socket
+import time
+import re
+import sys
+
+HOST = "192.168.0.230"
+PORT = 8003
+brickNo = []
+times = 50
+
+a_pre = False
+b_pre = False
+c_pre = False
+d_pre = False
+
+with open("text_out.txt", 'w') as f:
+    sys.stdout = f
+
+    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+        s.connect((HOST, PORT))
+        s.sendall(b"INST:COUP all\n")
+        time.sleep(1)
+        s.sendall(b"OUTP 1\n")
+        s.sendall(b"SYST:SCAN?\n")
+        x = s.recv(1024).decode()
+        y = re.split('[\r,;:]', x)
+        for i in y:
+            if i == '1' or i == '2' or i == '3' or i == '4':
+                brickNo.append(i)
+            if i == "1":
+                a_pre = True
+            if i == "2":
+                b_pre = True
+            if i == "3":
+                c_pre = True
+            if i == "4":
+                d_pre = True
+        s.close()
+
+
+
+    print("The Bricks present in the PS-FR are: " + " ,".join(str(x) for x in brickNo))
+
+
+    time.sleep(10)
+
+    b1v = []
+    b1c = []
+    b1t = []
+    b2v = []
+    b2c = []
+    b2t=[]
+    b3v = []
+    b3c = []
+    b3t=[]
+    b4v = []
+    b4c = []
+    b4t=[]
+    b1vf = []
+    b1cf = []
+    b1tf=[]
+    b2vf = []
+    b2cf = []
+    b2tf=[]
+    b3vf = []
+    b3cf = []
+    b3tf=[]
+    b4vf = []
+    b4cf = []
+    b4tf=[]
+
+    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+        s.connect((HOST, PORT))
+        print("Checking all the bricks!!!\n\n")
+        for i in range(0, times):
+            #Brick1
+            if a_pre == True:
+                s.sendall(b"INST:NSEL 1")
+                time.sleep(0.5)
+                s.sendall(b"MEAS:VOLT?")
+                b1v.append(s.recv(1024).decode().strip())
+                s.sendall(b"MEAS:CURR?")
+                b1c.append(s.recv(1024).decode().strip())
+                s.sendall(b"MEAS:TEMP?")
+                b1t.append(s.recv(1024).decode().strip())
+                s.sendall(b"OUTP:PROT:CLE\n")
+                s.sendall(b"VOLT 48\n")
+                s.sendall(b"VOLT:PROT:LEV 54\n")
+            #Brick2
+            if b_pre == True:
+                s.sendall(b"INST:NSEL 2")
+                time.sleep(0.5)
+                s.sendall(b"MEAS:VOLT?")
+                b2v.append(s.recv(1024).decode().strip())
+                s.sendall(b"MEAS:CURR?")
+                b2c.append(s.recv(1024).decode().strip())
+                s.sendall(b"MEAS:TEMP?")
+                b2t.append(s.recv(1024).decode().strip())
+                s.sendall(b"OUTP:PROT:CLE\n")
+                s.sendall(b"VOLT 48\n")
+                s.sendall(b"VOLT:PROT:LEV 54\n")
+            #Brick3
+            if c_pre == True:
+                s.sendall(b"INST:NSEL 3")
+                time.sleep(0.5)
+                s.sendall(b"MEAS:VOLT?")
+                b3v.append(s.recv(1024).decode().strip())
+                s.sendall(b"MEAS:CURR?")
+                b3c.append(s.recv(1024).decode().strip())
+                s.sendall(b"MEAS:TEMP?")
+                b3t.append(s.recv(1024).decode().strip())
+                s.sendall(b"OUTP:PROT:CLE\n")
+                s.sendall(b"VOLT 48\n")
+                s.sendall(b"VOLT:PROT:LEV 54\n")
+            #Brick4
+            if d_pre == True:
+                s.sendall(b"INST:NSEL 4")
+                time.sleep(0.5)
+                s.sendall(b"MEAS:VOLT?")
+                b4v.append(s.recv(1024).decode().strip())
+                s.sendall(b"MEAS:CURR?")
+                b4c.append(s.recv(1024).decode().strip())
+                s.sendall(b"MEAS:TEMP?")
+                b4t.append(s.recv(1024).decode().strip())
+                s.sendall(b"OUTP:PROT:CLE\n")
+                s.sendall(b"VOLT 48\n")
+                s.sendall(b"VOLT:PROT:LEV 54\n")
+
+        if a_pre == True:
+            for i in b1v:
+                b1vf.append(float(i))
+            for i in b1c:
+                b1cf.append(float(i))
+            for i in b1t:
+                b1tf.append(float(i))
+        if b_pre == True:
+            for i in b2v:
+                b2vf.append(float(i))
+            for i in b2c:
+                b2cf.append(float(i))
+            for i in b2t:
+                b2tf.append(float(i))
+        if c_pre == True:
+            for i in b3v:
+                b3vf.append(float(i))
+            for i in b3c:
+                b3cf.append(float(i))
+            for i in b3t:
+                b3tf.append(float(i))
+        if d_pre == True:
+            for i in b4v:
+                b4vf.append(float(i))
+            for i in b4c:
+                b4cf.append(float(i))
+            for i in b4t:
+                b4tf.append(float(i))
+        if a_pre == True:
+            b1v_avg = sum(b1vf) / times
+            b1c_avg = sum(b1cf) / times
+            b1t_avg = sum(b1tf) / times
+        if b_pre == True:
+            b2v_avg = sum(b2vf) / times
+            b2c_avg = sum(b2cf) / times
+            b2t_avg = sum(b2tf) / times
+        if c_pre == True:
+            b3v_avg = sum(b3vf) / times
+            b3c_avg = sum(b3cf) / times
+            b3t_avg = sum(b3tf) / times
+        if d_pre == True:
+            b4v_avg = sum(b4vf) / times
+            b4c_avg = sum(b4cf) / times
+            b4t_avg = sum(b4tf) / times
+        if a_pre == True:
+            print("Brick 1 voltage, current and temp is: " + str(f"{b1v_avg:4f}") + " V , " + str(f"{b1c_avg:4f}") + " A, " + str(f"{b1t_avg:4f}") + " C")
+        if b_pre == True:
+            print("Brick 2 voltage, current and temp is: " + str(f"{b2v_avg:4f}") + " V , " + str(f"{b2c_avg:4f}") + " A, " + str(f"{b2t_avg:4f}") + " C")
+        if c_pre == True:
+            print("Brick 3 voltage, current and temp is: " + str(f"{b3v_avg:4f}") + " V , " + str(f"{b3c_avg:4f}") + " A, " + str(f"{b3t_avg:4f}") + " C")
+        if d_pre == True:
+            print("Brick 4 voltage, current and temp is: " + str(f"{b4v_avg:4f}") + " V , " + str(f"{b4c_avg:4f}") + " A, " + str(f"{b4t_avg:4f}") + " C")
+
+        print("\n\n")
+
+        if a_pre == True and 46<b1v_avg<49 and 0<b1c_avg<18 and b1t_avg<50:
+            print("PS Brick 1 Passed!")
+        elif a_pre == False:
+            print("PS Brick 1 Absent---")
+        else:
+            print("PS Brick 1 Failed!")
+        if b_pre == True and 46<b2v_avg<49 and 0<b2c_avg<18 and b2t_avg<50:
+            print("PS Brick 2 Passed!")
+        elif b_pre == False:
+            print("PS Brick 2 Absent---")
+        else:
+            print("PS Brick 2 Failed!")
+        if c_pre == True and 46<b3v_avg<49 and 0<b3c_avg<18 and b3t_avg<50:
+            print("PS Brick 3 Passed!")
+        elif c_pre == False:
+            print("PS Brick 3 Absent---")
+        else:
+            print("PS Brick 3 Failed!")
+        if d_pre == True and 46<b4v_avg<49 and 0<b4c_avg<18 and b4t_avg<50:
+            print("PS Brick 4 Passed!")
+        elif d_pre == False:
+            print("PS Brick 4 Absent---")
+        else:
+            print("PS Brick 4 Failed!")
+        s.sendall(b"SYST:COMM:LAN:VERS?\n")
+        print("The F/W Version of PS is " + str(s.recv(1024).decode().strip()))
+        s.close()
+f.close()
+time.sleep(30)
